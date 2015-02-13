@@ -1,4 +1,4 @@
-<?php namespace App\Http\Controllers;
+<?php namespace OMS\Http\Controllers;
 
 class HomeController extends Controller {
 
@@ -34,3 +34,4 @@ class HomeController extends Controller {
 	}
 
 }
+
