@@ -1,4 +1,5 @@
-<?php
+<?php namespace OMS\Http\Controllers;
+
 
 class BaseController extends Controller {
 

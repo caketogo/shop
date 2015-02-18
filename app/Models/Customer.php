@@ -1,6 +1,7 @@
 <?php namespace OMS\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Eloquent;
 
 /**
  * Class Customer
@@ -9,7 +10,6 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Customer extends Eloquent {
 
-    use SoftDeletingTrait;
 
     /**
      * Database table for this model

@@ -1,12 +1,19 @@
 <?php namespace OMS\Http\Controllers;
 
+
 use OMS\Http\Requests;
 use OMS\Http\Controllers\Controller;
 use OMS\Http\Requests\API\CreateOrderRequest;
+use OMS\Models\Order as Order;
+use OMS\Models\OrderItem as OrderItem;
+
+use OMS\Models\Product as Product;
 
 use Illuminate\Http\Request;
+use Response;
+use Input;
 
-class OrdersAPIController extends APIController {
+class OrdersAPIController extends ApiController {
 
 	/**
 	 * Return all of the resources in the OMS. This will be paginated and return the most recent 20 by default.
@@ -15,7 +22,11 @@ class OrdersAPIController extends APIController {
 	 */
 	public function index()
 	{
-		$orders = Orders::all();
+
+		
+		$orders = Order::all();
+
+		dd($orders);
 	}
 
 	/**
@@ -23,14 +34,14 @@ class OrdersAPIController extends APIController {
 	 *
 	 * @return Response
 	 */
-	public function create(CreateOrderRequest $request)
+	public function create()
 	{
 		$order = new Order;
 
 		// Set the 'default' order status
-		$orderStatus = OrderStatus::find(Config::get('Orders::defaultStatus'));
+		//$orderStatus = OrderStatus::find(Config::get('Orders::defaultStatus'));
 
-		$orderStatus->order()->associate($order);
+		//$orderStatus->order()->associate($order);
 
 
 
@@ -51,9 +62,49 @@ class OrdersAPIController extends APIController {
 		//
 	}
 
-	public function addItem(AddItemToOrderRequest $request, $cartID, $itemID)
+
+
+	/*
+	* empties the cart
+	*/
+	public function emptyItems($order_id){
+
+		$order = Order::where('id',$order_id)->first();
+		$order->deleteItem();
+			// Return the response, with the order, as JSON
+		return Response::json($order);
+	}
+
+
+	/*
+	* adds an item to the order
+	* we need to get our price here
+	* by finding the product and getting the price
+	*/
+	public function addItem($order_id)
 	{
 
+
+		
+		$order = Order::where('id',$order_id)->first();
+		$product = Product::where('id',Input::get('id'))->first();
+
+
+		$item = array(
+					'order_id' => $order_id,
+					'product_id' => Input::get('id'),
+					'qty' => Input::get('qty'),
+					'description' => $product['name'],
+					'price' => $product['price'],
+					'cost' => $product['cost']
+
+				);
+
+		$order_item = OrderItem::create($item);
+		$order->sync();
+
+
+		return $order_id;
 	}
 
 	/**
@@ -64,7 +115,10 @@ class OrdersAPIController extends APIController {
 	 */
 	public function show($id)
 	{
-		//
+
+		$order = Order::with('orderItem')->find($id);
+		//$order->sync();
+		return Response::json($order);
 	}
 
 	/**

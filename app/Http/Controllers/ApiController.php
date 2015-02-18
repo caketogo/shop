@@ -1,9 +1,11 @@
-<?php
+<?php namespace OMS\Http\Controllers;
 
+use OMS\Http\Controllers\BaseController;
+use Response;
 /**
  * Class APIController
  */
-class APIController extends \BaseController {
+class APIController extends BaseController {
     /**
      * @var int
      */

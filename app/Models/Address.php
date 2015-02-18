@@ -1,8 +1,8 @@
 <?php namespace OMS\Models;
-
+use Eloquent;
 class Address extends Eloquent {
 
-    use SoftDeletingTrait;
+   // use SoftDeletingTrait;
 
     protected $table = "addresses";
 

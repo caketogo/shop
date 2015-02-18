@@ -12,8 +12,17 @@ use OMS\Models\OrderStatus as OrderStatus;
 | and give it the controller to call when that URI is requested.
 |
 */
+// Display all SQL executed in Eloquent
 
 Route::get('/', function() {
+
+
+
+	// Get an order
+	$order= OMS\Models\OrderItem::create(array('product_id'=>123,'order_id' => 234,'qty' => 1));
+	dd($order);
+
+	/*
 	// Get an order
 	$order = Order::findOrFail(1);
 
@@ -26,9 +35,11 @@ Route::get('/', function() {
 	dd($order);
 
 	return "Done";
+	*/
 
 });
 
+#Route::get('/orders/add', ['as' => 'orders.add', 'uses' => 'OrdersAPIController@add']);
 Route::get('home', 'HomeController@index');
 
 Route::controllers([
@@ -45,37 +56,111 @@ Route::group(array('prefix' => 'api'), function() {
 	 */
 	Route::group(array('prefix' => 'v1'), function() {
 
+
+
+
+
 		// Could probably have an 'orders' group here
 
 		/**
 		 * This will return all orders on the system
 		 */
-		Route::get('/orders', ['as' => 'orders.index', 'uses' => 'OrderController@index']);
+		Route::get('/orders', ['as' => 'orders.index', 'uses' => 'OrdersAPIController@index']);
 
 		/**
 		 * This will add a new order to the system and return the newly created order
 		 */
-		Route::post('/orders', ['as' => 'orders.create', 'uses' => 'OrderController@create']);
+		Route::post('/orders', ['as' => 'orders.create', 'uses' => 'OrdersAPIController@create']);
 
 		/**
 		 * This will get a specific order off the cart
 		 */
-		Route::get('/orders/{cartid}', ['as' => 'orders.show', 'uses' => 'OrderController@show']);
+		Route::get('/orders/{cartid}', ['as' => 'orders.show', 'uses' => 'OrdersAPIController@show']);
 
 		/**
 		 * This will add the passed productid to the cart
 		 */
-		Route::post('/orders/{cartid}/add/{productid}', ['as' => 'orders.items.create', 'uses' => 'OrderController@createItem']);
+		Route::post('/orders/{cartid}/add', ['as' => 'orders.items.add', 'uses' => 'OrdersAPIController@addItem']);
 
 		/**
 		 * This will update the passed productid (for instance, quantity)
 		 */
-		Route::patch('/orders/{cartid}/update/{productid}', ['as' => 'orders.items.patch', 'uses' => 'OrderController@updateItem']);
+		Route::patch('/orders/{cartid}/update/{productid}', ['as' => 'orders.items.patch', 'uses' => 'OrdersAPIController@updateItem']);
 
 		/**
 		 * This will delete the passed productid from the order
 		 */
 		Route::delete('/orders/{cartid}/delete/{productid}', ['as' => 'orders.items.delete', 'uses' => 'OrderItemController@deleteItem']);
+
+
+		/**
+		 * This will empty the passed cartid ** not sure this is correct way to do it.
+		*/
+		Route::get('/orders/{cartid}/empty', ['as' => 'orders.empty', 'uses' => 'OrdersAPIController@emptyItems']);
+
+
+
+
+
+
+
+		//products
+
+		/**
+		* return all the products
+		*/
+		Route::get('/products', ['as' => 'products.index', 'uses' => 'ProductsAPIController@index']);
+
+		/**
+		* return single product specified in id
+		*/
+		Route::get('/products/{id}', ['as' => 'products.show', 'uses' => 'ProductsAPIController@show']);
+
+
+
+		/**
+		 * CUSTOMERS
+		 */
+		Route::group(array('prefix' => 'customers'), function() {
+
+			Route::post('/', [
+				'as' => 'customers.create',
+				'uses' => 'CustomersAPIController@create'
+			]);
+
+			Route::get('/', [
+				'as' => 'customers.index',
+				'uses' =>'CustomersAPIController@index'
+			]);
+
+			Route::get('/{id}', [
+				'as' => 'customers.show',
+				'uses' => 'CustomersAPIController@show'
+			]);
+
+			Route::patch('/{id}', [
+				'as' => 'customers.update',
+				'uses' => 'CustomersAPIController@update'
+			]);
+
+			Route::post('/login', [
+				'as' => 'customers.login',
+				'uses' => 'CustomersAPIController@login'
+			]);
+
+			//address stuff
+				Route::post('/{id}/addresses', [
+				'as' => 'customers.address.create',
+				'uses' => 'CustomersAPIController@create_address'
+			]);
+
+				Route::get('/{id}/addresses', [
+				'as' => 'customers.address.index',
+				'uses' => 'CustomersAPIController@index_address'
+			]);
+
+
+		});
 
 	});
 
