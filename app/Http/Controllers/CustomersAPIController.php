@@ -30,6 +30,20 @@ class CustomersAPIController extends ApiController {
 
 		dd($orders);
 	}
+    /**
+     * Display the specified resource.
+     *
+     * @param  int  $id
+     * @return Response
+     */
+    public function show($id)
+    {
+
+        $customer = Customer::find($id);
+    
+        return Response::json($customer);
+    }
+
 
 	/**
 	 * Show the form for creating a new resource.

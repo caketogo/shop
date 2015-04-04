@@ -145,6 +145,12 @@ return [
 		'OMS\Providers\EventServiceProvider',
 		'OMS\Providers\RouteServiceProvider',
 
+		/*
+		* some useful Providers
+		*/
+		'Cviebrock\EloquentSluggable\SluggableServiceProvider',
+		'Ignited\LaravelOmnipay\LaravelOmnipayServiceProvider',
+
 	],
 
 	/*
@@ -192,6 +198,7 @@ return [
 		'URL'       => 'Illuminate\Support\Facades\URL',
 		'Validator' => 'Illuminate\Support\Facades\Validator',
 		'View'      => 'Illuminate\Support\Facades\View',
+		'Omnipay' => 'Ignited\LaravelOmnipay\Facades\OmnipayFacade',
 
 	],
 

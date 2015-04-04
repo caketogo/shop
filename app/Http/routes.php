@@ -38,6 +38,10 @@ Route::get('/', function() {
 	*/
 
 });
+#
+Route::controller('site', 'SiteController');
+Route::controller('product', 'ProductController');
+
 
 #Route::get('/orders/add', ['as' => 'orders.add', 'uses' => 'OrdersAPIController@add']);
 Route::get('home', 'HomeController@index');
@@ -98,10 +102,16 @@ Route::group(array('prefix' => 'api'), function() {
 		*/
 		Route::get('/orders/{cartid}/empty', ['as' => 'orders.empty', 'uses' => 'OrdersAPIController@emptyItems']);
 
+		/**
+		 * create a new transaction agains an order
+		 */
+		Route::get('/orders/{id}/transaction', ['as' => 'orders.transaction', 'uses' => 'OrdersAPIController@transaction']);
 
+		Route::get('/orders/{id}/pay', ['as' => 'orders.pay', 'uses' => 'OrdersAPIController@pay']);
 
+		Route::get('/orders/{id}/complete', ['as' => 'orders.complete', 'uses' => 'OrdersAPIController@complete']);
 
-
+		/*
 
 
 		//products
@@ -109,12 +119,49 @@ Route::group(array('prefix' => 'api'), function() {
 		/**
 		* return all the products
 		*/
-		Route::get('/products', ['as' => 'products.index', 'uses' => 'ProductsAPIController@index']);
+		//Route::get('/products', ['as' => 'products.index', 'uses' => 'ProductsAPIController@index']);
 
 		/**
 		* return single product specified in id
 		*/
-		Route::get('/products/{id}', ['as' => 'products.show', 'uses' => 'ProductsAPIController@show']);
+		//Route::get('/products/{id}', ['as' => 'products.show', 'uses' => 'ProductsAPIController@show']);
+		
+		/**
+		 * Products
+		 */
+		Route::group(array('prefix' => 'products'), function() {
+
+			Route::post('/', [
+				'as' => 'products.create',
+				'uses' => 'ProductsAPIController@create'
+			]);
+
+				Route::get('/add/', [
+				'as' => 'products.test',
+				'uses' => 'ProductsAPIController@test'
+			]);
+
+			Route::get('/', [
+				'as' => 'products.index',
+				'uses' =>'ProductsAPIController@index'
+			]);
+
+			Route::get('/{id}', [
+				'as' => 'products.show',
+				'uses' => 'ProductsAPIController@show'
+			]);
+
+			Route::patch('/{id}', [
+				'as' => 'products.update',
+				'uses' => 'ProductsAPIController@update'
+			]);
+
+			Route::delete('/{id}', [
+				'as' => 'products.delete',
+				'uses' => 'ProductsAPIController@delete'
+			]);
+		});
+
 
 
 
@@ -161,6 +208,56 @@ Route::group(array('prefix' => 'api'), function() {
 
 
 		});
+		/**
+		 * PAYMENTS
+		 */
+		Route::group(array('prefix' => 'payments'), function() {
+
+			Route::post('/{id}', [
+				'as' => 'payments.create',
+				'uses' => 'PaymentsAPIController@create'
+			]);
+			
+
+			Route::get('/methods', [
+				'as' => 'payments.methods',
+				'uses' =>'PaymentsAPIController@methods'
+			]);
+
+			Route::get('/methods/{id}', [
+				'as' => 'payments.methods',
+				'uses' =>'PaymentsAPIController@show_method'
+			]);
+			
+			Route::get('/pay/{id}', [
+				'as' => 'payments.pay',
+				'uses' => 'PaymentsAPIController@pay'
+			]);
+/*
+			Route::patch('/{id}', [
+				'as' => 'customers.update',
+				'uses' => 'CustomersAPIController@update'
+			]);
+
+			Route::post('/login', [
+				'as' => 'customers.login',
+				'uses' => 'CustomersAPIController@login'
+			]);
+
+			//address stuff
+				Route::post('/{id}/addresses', [
+				'as' => 'customers.address.create',
+				'uses' => 'CustomersAPIController@create_address'
+			]);
+
+				Route::get('/{id}/addresses', [
+				'as' => 'customers.address.index',
+				'uses' => 'CustomersAPIController@index_address'
+			]);
+
+			*/
+		});
+
 
 	});
 

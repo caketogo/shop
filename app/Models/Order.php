@@ -44,15 +44,16 @@ class Order extends Eloquent
     */
     public function sync()
     {
-
+       
 
         $items=  $this->orderItem;
+       
         $this->amount = 0;
-        $this->items = 0;
+        $this->total_items = 0;
         foreach($items as $item){
             $this->amount+= $item->price;
-            $this->items+= $item->qty;
-            //echo $this->amount;
+            $this->total_items+= $item->quantity;
+            
 
         }
         $this->save();
