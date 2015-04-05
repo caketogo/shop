@@ -1,6 +1,8 @@
 <?php namespace OMS\Models;
 
 use Eloquent;
+use OMS\Models\OrderStatus as OrderStatus;
+
 
 class Order extends Eloquent
 {
@@ -15,10 +17,20 @@ class Order extends Eloquent
      */
     protected $guarded = [];
 
+    /**
+    * Change the status of the order based on the passed status name
+    **/
+    public function setStatus($status_name)
+    {
+        $order_status = OrderStatus::where('name',$status_name)->first();
+        $this->orderStatus()->associate($order_status);
+        $this->save();
+     
 
+    }
     public function orderStatus()
     {
-        return $this->belongsTo('OMS\Models\OrderStatus', 'order_statuses_id');
+        return $this->belongsTo('OMS\Models\OrderStatus', 'order_status_id');
     }
 
     public function customer()

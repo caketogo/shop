@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use OMS\Models\PaymentMethod as PaymentMethod;
 use OMS\Models\Payment as Payment;
 use OMS\Models\Order as Order;
+use OMS\Models\OrderStatus as OrderStatus;
 
 use Response;
 use Input;
@@ -40,63 +41,78 @@ class PaymentsAPIController extends ApiController {
 	}
 
 
-	public function pay($order_id)
+	public function view($order_id)
 	{
 		
-		$payment = new Payment;
 		$order = Order::find($order_id);
+		$amount = $order->amount * 100;
+			$form ='
+		<form action="" method="POST">
+  		<script
+    		src="https://checkout.stripe.com/checkout.js" class="stripe-button"
+    		data-key="pk_test_lZESGr161LaJH9rTi0esWR8o"
+    		data-amount="'.$amount.'"
+    		data-name="Demo Site"
+    		data-description="2 widgets ($20.00)"
+    		data-image="/128x128.png">
+  		</script>
+		</form>
+		';
 
-		$payment->order_id = $order_id;
+		return Response::json($form);
+	}
 
-		Omnipay::setGateway('stripe');
-		
-		$cardInput = [
-    		'number'      => '4242424242424242',
-    		'firstName'   => 'MR Simon Bridgewater',
-    		'expiryMonth' => '03',
-    		'expiryYear'  => '16',
-    		'cvv'         => '333',
-		];
-		
-		$card = Omnipay::creditCard($cardInput);
-		
-		$response = Omnipay::purchase([
-    		'amount'    => $order->amount,
-    		'card'      => $cardInput,
-    		'returnUrl' => 'localhost',
-    		'cancelUrl' => 'localhost',
-    		'transactionId'=> $order_id
-		])->send();
+
+
+
+	public function purchase($order_id)
+	{
+
+		$token = Input::get('token');
+		$order = Order::find($order_id);
+		$payment = Payment::where('order_id',$order_id)->orderBy('updated_at','desc')->first();
 	
-		//stripe id =2
-		$payment->payment_method_id = 2;
-
-		try{
-
-			if ($response->isSuccessful()) {
+		Omnipay::setGateway('stripe');
+	    $response = Omnipay::purchase(['amount' =>  $order->amount, 'currency' => 'USD', 'token' => $token])->send();
+	  
+	    if ($response->isSuccessful()) {
     			// payment was successful: update database
     			$payment->payment_status_id = 1;
+
     	
 			} elseif ($response->isRedirect()) {
     
 				$payment->payment_status_id = 3;
-    			$response->redirect();
+    			//$response->redirect();
 			} else {
     			// payment failed:  
-    			dd($response);
+    			//dd($response);
     			$payment->payment_status_id = 2;
     		
 			}
-		} catch(\Exception $e){
-
-			dd($e->getMessage());
-
-
-		}
-
 
 		$payment->transaction_id = $response->getTransactionReference();
-		$payment->save();
+
+		if($payment->save()){
+
+			$order->setStatus('Confirmed');
+		}
+		
+		return Response::json(array('status' => $payment->payment_status_id));
+
+	}
+
+	public function pay($order_id)
+	{
+
+
+		$payment = new Payment;
+		$order = Order::find($order_id);
+		$payment->order_id = $order_id;
+	
+
+		$order->setStatus('Payment');
+		
 		
 		return array('status' => $payment->payment_status_id);
 
@@ -113,9 +129,14 @@ class PaymentsAPIController extends ApiController {
 	public function create($order_id)
 	{
 		$payment = new Payment;
+		$order = Order::find($order_id);
+
 		$payment->payment_method_id = Input::get('payment_method_id');
 		$payment->order_id = $order_id;
-		$payment->save();
+		if($payment->save()){
+
+			$order->setStatus('Payment');
+		}
 
 		
 		return Response::json($payment);

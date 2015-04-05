@@ -17,7 +17,9 @@ class OrderStatus extends Eloquent
 
     public function orders()
     {
-        return $this->hasMany('OMS\Models\Order', 'order_statuses_id');
+        return $this->hasMany('OMS\Models\Order', 'order_status_id');
     }
+
+
 
 }

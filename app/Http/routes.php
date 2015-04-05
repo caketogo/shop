@@ -229,10 +229,20 @@ Route::group(array('prefix' => 'api'), function() {
 				'uses' =>'PaymentsAPIController@show_method'
 			]);
 			
-			Route::get('/pay/{id}', [
+			Route::get('/{id}/pay', [
 				'as' => 'payments.pay',
 				'uses' => 'PaymentsAPIController@pay'
 			]);
+			Route::get('/{id}/views', [
+				'as' => 'payments.view',
+				'uses' => 'PaymentsAPIController@view'
+			]);
+			Route::post('/{id}/purchase', [
+				'as' => 'payments.purchase',
+				'uses' => 'PaymentsAPIController@purchase'
+			]);
+
+
 /*
 			Route::patch('/{id}', [
 				'as' => 'customers.update',
